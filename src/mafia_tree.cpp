@@ -158,3 +158,51 @@ void MafiaTree::load_from_csv(string filename) {
     }
 }
 
+void MafiaTree::show_alive_succession() {
+    cout << "\n--- Linea de Sucesion Actual (Solo Vivos) ---" << endl;
+    print_alive_lineage(root, 0);
+    cout << "---------------------------------------------\n";
+}
+
+TreeNode* MafiaTree::get_current_boss() {
+    return find_boss_recursive(root);
+}
+
+TreeNode* MafiaTree::find_boss_recursive(TreeNode* node) {
+    if (!node) return nullptr;
+    if (node->is_boss) return node;
+    TreeNode* left_res = find_boss_recursive(node->left);
+    if (left_res) return left_res;
+    return find_boss_recursive(node->right);
+}
+
+void MafiaTree::check_and_update_boss() {
+    TreeNode* boss = get_current_boss();
+    if (!boss) {
+        cout << "No hay jefe actual asignado." << endl;
+        return;
+    }
+
+    if (boss->is_dead  boss->in_jail  boss->age > 70) {
+        cout << "El jefe actual (" << boss->name << ") ha muerto, ido a prision o pasado de los 70 anos. Iniciando sucesion..." << endl;
+        
+        boss->is_boss = false;
+        boss->was_boss = true;
+
+        TreeNode* new_boss = get_next_boss(boss, false);
+        
+        if (!new_boss) {
+            cout << "No hay sucesores libres vivos. Buscando sucesor en prision..." << endl;
+            new_boss = get_next_boss(boss, true);
+        }
+
+        if (new_boss) {
+            new_boss->is_boss = true;
+            cout << "NUEVO JEFE ASIGNADO: " << new_boss->name << " " << new_boss->last_name << endl;
+        } else {
+            cout << "CRITICO: No se encontraron candidatos vivos para la sucesion." << endl;
+        }
+    } else {
+        cout << "El jefe actual (" << boss->name << ") se encuentra bien y en el cargo." << endl;
+    }
+}
