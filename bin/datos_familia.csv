@@ -1,0 +1,13 @@
+id,name,last_name,gender,age,id_boss,is_dead,in_jail,was_boss,is_boss
+1,Victor,Adarme-Aguillon,H,75,0,1,0,1,0
+2,Ruben,Adarme-Aguillon,H,55,1,0,0,0,1
+3,Gabriela,Adarme-Aguillon,M,52,1,0,1,0,0
+4,Jesus,Adarme-Aguillon,H,32,2,0,0,0,0
+5,Rosa,Adarme-Aguillon,M,29,2,0,0,0,0
+6,Andres,Adarme-Aguillon,H,30,3,1,0,0,0
+7,Isabella,Adarme-Aguillon,M,27,3,0,0,0,0
+8,Cebrian,Adarme-Aguillon,H,20,4,0,1,0,0
+9,Samantha,Adarme-Aguillon,M,19,4,0,0,0,0
+10,Daniel,Adarme-Aguillon,H,18,5,0,0,0,0
+11,Gabriel,Adarme-Aguillon,H,18,6,0,0,0,0
+
