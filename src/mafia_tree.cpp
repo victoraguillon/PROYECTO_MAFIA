@@ -88,3 +88,73 @@ TreeNode* MafiaTree::get_next_boss(TreeNode* dead_boss, bool allow_jailed){
     return nullptr;
 }
 
+void MafiaTree::print_alive_lineage(TreeNode* node, int level){
+    if (!node) return;
+    if (!node->is_dead){
+        for (int i = 0; i < level; i++) cout << "  ";
+        cout << "-" << node->name << " " << node->last_name 
+        << (node->is_boss ? " [JEFE ACTUAL]" : "")
+             << (node->in_jail ? " [EN PRISION]" : "") << endl;
+    }
+
+    print_alive_lineage(node->left, level + 1);
+    print_alive_lineage(node->right, level + 1);
+}
+
+void MafiaTree::load_from_csv(string filename) {
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cout << "Error: No se pudo abrir el archivo " << filename << endl;
+        return;
+    }
+
+    string line;
+    getline(file, line);
+
+    CustomList nodes_list;
+   while (getline(file, line)) {
+        stringstream ss(line);
+        string token;
+        TreeNode* new_node = new TreeNode();
+        getline(ss, token, ','); new_node->id = stoi(token);
+        getline(ss, new_node->name, ',');
+        getline(ss, new_node->last_name, ',');
+        getline(ss, token, ','); new_node->gender = token[0];
+        getline(ss, token, ','); new_node->age = stoi(token);
+        getline(ss, token, ','); new_node->id_boss = stoi(token);
+        getline(ss, token, ','); new_node->is_dead = stoi(token);
+        getline(ss, token, ','); new_node->in_jail = stoi(token);
+        getline(ss, token, ','); new_node->was_boss = stoi(token);
+        getline(ss, token, ','); new_node->is_boss = stoi(token);
+
+        nodes_list.push_back(new_node);
+    }
+    file.close();
+
+    ListNode* current = nodes_list.head;
+    while (current != nullptr) {
+        TreeNode* node = current->tree_node;
+        if (node->id_boss == 0) {
+            root = node;
+        } else {
+            ListNode* search = nodes_list.head;
+            TreeNode* boss_node = nullptr;
+            while (search != nullptr) {
+                if (search->tree_node->id == node->id_boss) {
+                    boss_node = search->tree_node;
+                    break;
+                }
+                search = search->next;
+            }
+
+            if (boss_node) {
+                node->parent = boss_node;
+                if (!boss_node->left) boss_node->left = node;
+                else if (!boss_node->right) boss_node->right = node;
+                else cout << "Alerta: Jefe " << boss_node->id << " ya tiene 2 sucesores." << endl;
+            }
+        }
+        current = current->next;
+    }
+}
+
