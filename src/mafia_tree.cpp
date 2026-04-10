@@ -38,6 +38,15 @@ void CustomList::push_back(TreeNode* node) {
 
 MafiaTree::MafiaTree(): root(nullptr) {}
 
+static int safe_stoi(const std::string& token, int fallback = 0) {
+    if (token.empty()) return fallback;
+    try {
+        return std::stoi(token);
+    } catch (...) {
+        return fallback;
+    }
+}
+
 TreeNode* MafiaTree::search_node(TreeNode* current, int id){
     if (!current) return nullptr;
     if (current->id == id) return current;
@@ -112,20 +121,29 @@ void MafiaTree::load_from_csv(string filename) {
     getline(file, line);
 
     CustomList nodes_list;
-   while (getline(file, line)) {
+    while (getline(file, line)) {
+        if (line.empty() || line == "\r") continue;
+
         stringstream ss(line);
         string token;
         TreeNode* new_node = new TreeNode();
-        getline(ss, token, ','); new_node->id = stoi(token);
+
+        getline(ss, token, ','); new_node->id = safe_stoi(token, -1);
+        if (new_node->id < 0) {
+            delete new_node;
+            continue;
+        }
+
         getline(ss, new_node->name, ',');
         getline(ss, new_node->last_name, ',');
-        getline(ss, token, ','); new_node->gender = token[0];
-        getline(ss, token, ','); new_node->age = stoi(token);
-        getline(ss, token, ','); new_node->id_boss = stoi(token);
-        getline(ss, token, ','); new_node->is_dead = stoi(token);
-        getline(ss, token, ','); new_node->in_jail = stoi(token);
-        getline(ss, token, ','); new_node->was_boss = stoi(token);
-        getline(ss, token, ','); new_node->is_boss = stoi(token);
+        getline(ss, token, ',');
+        new_node->gender = token.empty() ? '\0' : token[0];
+        getline(ss, token, ','); new_node->age = safe_stoi(token);
+        getline(ss, token, ','); new_node->id_boss = safe_stoi(token);
+        getline(ss, token, ','); new_node->is_dead = safe_stoi(token);
+        getline(ss, token, ','); new_node->in_jail = safe_stoi(token);
+        getline(ss, token, ','); new_node->was_boss = safe_stoi(token);
+        getline(ss, token, ','); new_node->is_boss = safe_stoi(token);
 
         nodes_list.push_back(new_node);
     }
@@ -156,6 +174,30 @@ void MafiaTree::load_from_csv(string filename) {
         }
         current = current->next;
     }
+
+    int boss_count = 0;
+    current = nodes_list.head;
+    while (current != nullptr) {
+        if (current->tree_node->is_boss) boss_count++;
+        current = current->next;
+    }
+
+    if (root && root->id_boss == 0 && !root->is_dead && !root->in_jail) {
+        current = nodes_list.head;
+        while (current != nullptr) {
+            current->tree_node->is_boss = (current->tree_node == root);
+            current = current->next;
+        }
+    } else if (boss_count == 0 && root && !root->is_dead && !root->in_jail) {
+        root->is_boss = true;
+    } else if (boss_count > 1 && root && !root->is_dead && !root->in_jail) {
+        current = nodes_list.head;
+        while (current != nullptr) {
+            if (current->tree_node != root) current->tree_node->is_boss = false;
+            current = current->next;
+        }
+        root->is_boss = true;
+    }
 }
 
 void MafiaTree::show_alive_succession() {
@@ -165,7 +207,10 @@ void MafiaTree::show_alive_succession() {
 }
 
 TreeNode* MafiaTree::get_current_boss() {
-    return find_boss_recursive(root);
+    TreeNode* boss = find_boss_recursive(root);
+    if (boss) return boss;
+    if (root && !root->is_dead && !root->in_jail) return root;
+    return nullptr;
 }
 
 TreeNode* MafiaTree::find_boss_recursive(TreeNode* node) {
@@ -183,8 +228,8 @@ void MafiaTree::check_and_update_boss() {
         return;
     }
 
-    if (boss->is_dead  boss->in_jail  boss->age > 70) {
-        cout << "El jefe actual (" << boss->name << ") ha muerto, ido a prision o pasado de los 70 anos. Iniciando sucesion..." << endl;
+    if (boss->is_dead || boss->in_jail || boss->age > 70) {
+        cout << "El jefe actual (" << boss->name << ") ha muerto, ido a prision o pasado de los 70 años. Iniciando sucesion..." << endl;
         
         boss->is_boss = false;
         boss->was_boss = true;
@@ -205,4 +250,46 @@ void MafiaTree::check_and_update_boss() {
     } else {
         cout << "El jefe actual (" << boss->name << ") se encuentra bien y en el cargo." << endl;
     }
+}
+
+void MafiaTree::edit_node_data(int id) {
+    TreeNode* node = search_node(root, id);
+    if (!node) {
+        cout << "Miembro con ID " << id << " no encontrado." << endl;
+        return;
+    }
+
+    cout << "Editando datos de: " << node->name << " " << node->last_name << endl;
+    cout << "Nombre actual: " << node->name << endl;
+    cout << "Nuevo nombre (dejar vacio para no cambiar): ";
+    string new_name;
+    getline(cin, new_name);
+    if (!new_name.empty()) node->name = new_name;
+
+    cout << "Apellido actual: " << node->last_name << endl;
+    cout << "Nuevo apellido (dejar vacio para no cambiar): ";
+    string new_last_name;
+    getline(cin, new_last_name);
+    if (!new_last_name.empty()) node->last_name = new_last_name;
+
+    cout << "Edad actual: " << node->age << endl;
+    cout << "Nueva edad (0 para no cambiar): ";
+    int new_age;
+    cin >> new_age;
+    cin.ignore(10000, '\n');
+    if (new_age > 0) node->age = new_age;
+
+    cout << "Esta muerto? (1=si, 0=no, -1=no cambiar): ";
+    int dead;
+    cin >> dead;
+    cin.ignore(10000, '\n');
+    if (dead == 0 || dead == 1) node->is_dead = dead;
+
+    cout << "Esta en prision? (1=si, 0=no, -1=no cambiar): ";
+    int jail;
+    cin >> jail;
+    cin.ignore(10000, '\n');
+    if (jail == 0 || jail == 1) node->in_jail = jail;
+
+    cout << "Datos actualizados." << endl;
 }

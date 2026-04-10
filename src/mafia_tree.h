@@ -30,6 +30,7 @@ struct ListNode {
     ListNode(TreeNode* node);
 };
 
+
 class CustomList {
     public:
         ListNode* head;

@@ -25,9 +25,9 @@ inline void draw_line (const std::string& line){
     }
 
     inline void header (std::string title){
-        draw_line();
+        draw_line("");
         std::cout << BOLD << CYAN << title << RESET << std::endl;
-        draw_line();
+        draw_line("");
     }
 }
 
