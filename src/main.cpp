@@ -1,6 +1,30 @@
 #include <iostream>
 #include "mafia_tree.h"
 #include "utils.h"
+#include <iostream>
+#include <locale>
+#include <clocale>
+#ifdef _WIN32
+#include <windows.h>
+#endif
+#include "mafia_tree.h"
+#include "utils.h"
+
+using namespace std;
+
+y esto inmediatamente despues del main:
+
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
+    setlocale(LC_ALL, "");
+    locale::global(locale(""));
+    cout.imbue(locale());
+    cin.imbue(locale());
+
+    MafiaTree familia;
+    familia.load_from_csv("../bin/datos_familia.csv"); 
 
 using namespace std;
 
