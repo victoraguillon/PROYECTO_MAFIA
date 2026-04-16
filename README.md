@@ -85,3 +85,47 @@ id,name,last_name,gender,age,id_boss,is_dead,in_jail,was_boss,is_boss
 - `was_boss`: Si fue Don anteriormente (0=no, 1=sí)
 - `is_boss`: Si es el Don actual (0=no, 1=sí)
 
+
+## 📁 Estructura del Proyecto
+
+proyecto-mafia/
+├── README.md                 # Documentación del proyecto
+├── bin/
+│   ├── datos_familia.csv     # Datos de la familia
+│   └── programa_mafia.exe    # Ejecutable compilado
+├── src/
+│   ├── main.cpp              # Punto de entrada del programa
+│   ├── mafia_tree.h          # Definiciones de clases y estructuras
+│   ├── mafia_tree.cpp        # Implementación del árbol de mafia
+│   ├── utils.h               # Utilidades de interfaz
+│   └── build/
+│       └── Debug/            # Archivos de compilación
+└── .vscode/                  # Configuración de VS Code
+
+## 🔧 Arquitectura Técnica
+
+### Clases Principales
+
+- `MafiaTree`: Clase principal que gestiona el árbol familiar
+  - load_from_csv(): Carga datos desde archivo CSV
+  - show_alive_succession(): Muestra línea de sucesión
+  - check_and_update_boss(): Protocolo de sucesión
+  - edit_node_data(): Edición de miembros
+
+- `TreeNode`: Estructura que representa un miembro familiar
+- `CustomList`: Lista enlazada personalizada para operaciones auxiliares
+
+### Algoritmos Implementados
+
+- Búsqueda en Árbol: Recursiva para encontrar nodos por ID
+- Sucesión Inteligente: Busca candidatos válidos siguiendo reglas de herencia
+- Validación de Candidatos: Verifica estado de vida y encarcelamiento
+
+
+## 👥 Autores
+
+Ruben Adarme y Víctor Aguillón 
+
+
+---
+*"La familia es lo primero.* 🕵️‍♂️
