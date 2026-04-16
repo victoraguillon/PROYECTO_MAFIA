@@ -1,7 +1,4 @@
 #include <iostream>
-#include "mafia_tree.h"
-#include "utils.h"
-#include <iostream>
 #include <locale>
 #include <clocale>
 #ifdef _WIN32
@@ -9,12 +6,10 @@
 #endif
 #include "mafia_tree.h"
 #include "utils.h"
-
 using namespace std;
 
-y esto inmediatamente despues del main:
-
-#ifdef _WIN32
+int main() {
+    #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
 #endif
@@ -25,10 +20,6 @@ y esto inmediatamente despues del main:
 
     MafiaTree familia;
     familia.load_from_csv("../bin/datos_familia.csv"); 
-
-using namespace std;
-
-int main() {
     MafiaTree familia;
     familia.load_from_csv("../bin/datos_familia.csv"); 
 
@@ -68,7 +59,7 @@ int main() {
                 break;
             }
             case 4:
-                cout << RED << BOLD << "\nCerrando sistema... Omerta." << RESET << endl;
+                cout << RED << BOLD << "\nCerrando sistema..." << RESET << endl;
                 break;
         }
     }
