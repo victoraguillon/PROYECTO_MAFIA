@@ -41,7 +41,7 @@ Usando el compilador GCC incluido en el proyecto:
 
 ```bash
 # Desde la raíz del proyecto
-gcc -fdiagnostics-color=always -g src/main.cpp src/mafia_tree.cpp -o bin/programa_mafia.exe
+g++ src/main.cpp src/mafia_tree.cpp -o bin/programa_mafia.exe
 ```
 
 O utilizando el task de VS Code:
